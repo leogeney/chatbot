@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot con Tailwind CSS</title>
+    <!-- Agregar Tailwind CSS desde CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Personaliza la apariencia de la ventana de chat */
+        .chat-window {
+            max-width: 400px;
+            max-height: 600px;
+            height: 100%;
+            width: 100%;
+            transition: all 0.3s ease; /* Agregar transición suave */
+        }
+
+        .chat-box {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 10px;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .minimized {
+            height: 50px; /* Solo mostrar barra de título cuando está minimizado */
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #f3f4f6;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .chat-header .minimize-btn {
+            cursor: pointer;
+        }
+
+        /* Agregar un estilo para ocultar el chat box cuando está minimizado */
+        .minimized .chat-box {
+            display: none;
+        }
+
+    </style>
+</head>
+<body class="bg-green-500">
+
+<!-- Contenedor principal del chatbot -->
+<div id="chatContainer" class="fixed bottom-5 right-5 bg-green-600 shadow-xl rounded-lg overflow-hidden">
+    <div class="chat-header" id="chatHeader">
+        <span class="font-semibold text-green-700">Chatbot</span>
+        <button id="minimizeBtn" class="minimize-btn text-gray-600">-</button>
+    </div>
+
+    <div id="chatWindow" class="chat-window flex flex-col h-80 w-80 border border-gray-300">
+        <!-- Ventana del chat -->
+        <div class="chat-box p-4 bg-gray-100 flex flex-col space-y-2" id="chatMessages">
+            <!-- Mensajes -->
+        </div>
+
+        <!-- Input para escribir el mensaje -->
+        <div class="p-2 bg-gray-200">
+            <input id="chatInput" type="text" placeholder="Escribe tu mensaje..." class="chat-input focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        </div>
+    </div>
+</div>
+
+<!-- Script de Chatbot -->
+<script>
+    const chatInput = document.getElementById('chatInput');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatContainer = document.getElementById('chatContainer');
+    const chatWindow = document.getElementById('chatWindow');
+    const minimizeBtn = document.getElementById('minimizeBtn');
+
+    let isMinimized = false; // Estado de la ventana (minimizada o no)
+
+    // Función para enviar mensajes
+    function sendMessage() {
+        const userMessage = chatInput.value.trim(); // Captura el mensaje del usuario
+        if (userMessage === '') return; // No hacer nada si el mensaje está vacío
+
+        // Mostrar el mensaje del usuario
+        const userMessageElement = document.createElement('div');
+        userMessageElement.classList.add( 'text-blue-600', 'p-2');
+        userMessageElement.innerHTML = `<p class=" p-2 rounded-lg w-20">${userMessage}</p>`;
+        chatMessages.appendChild(userMessageElement);
+
+        // Limpiar el campo de entrada
+        chatInput.value = '';
+
+        // Simular respuesta del chatbot con lógica básica
+        setTimeout(() => {
+            const botMessage = getBotResponse(userMessage);
+            const botMessageElement = document.createElement('div');
+            botMessageElement.classList.add('text-left', 'text-gray-700', 'p-2');
+            botMessageElement.innerHTML = `<p class="bg-gray-200 w-30 h-30 p-2 rounded-lg">${botMessage}</p>`;
+            chatMessages.appendChild(botMessageElement);
+            
+            // Desplazar hacia abajo para mostrar el último mensaje
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 1000);
+
+        // Desplazar hacia abajo para mostrar el último mensaje inmediatamente
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Función para obtener la respuesta del bot basada en el mensaje del usuario
+    function getBotResponse(userMessage) {
+        userMessage = userMessage.toLowerCase(); // Convertir a minúsculas para facilitar la comparación
+
+        if (userMessage.includes('hola') || userMessage.includes('hey') || userMessage.includes('buenos días')) {
+            return "¡Hola! ¿Cómo puedo ayudarte?";
+        }
+
+        if (userMessage.includes('cómo estás') || userMessage.includes('qué tal')) {
+            return "¡Estoy bien, gracias por preguntar! ¿Y tú?";
+        }
+
+        if (userMessage.includes('nombre') || userMessage.includes('quién eres')) {
+            return "Soy un chatbot creado para ayudarte. ¿En qué te puedo asistir?";
+        }
+
+        if (userMessage.includes('hora') || userMessage.includes('qué hora es')) {
+            const now = new Date();
+            return `La hora actual es: ${now.getHours()}:${now.getMinutes()}`;
+        }
+
+        if (userMessage.includes('que haces') || userMessage.includes('que estas haciendo')) {
+            return "Nada, aquí contigo.";
+        }
+
+        if (userMessage.includes('bleesd o ryan castro') || userMessage.includes('bendito o el gheto')) {
+            return "Mr. Stiven.";
+        }
+
+        if (userMessage.includes('quien es el mas patico de la u') || userMessage.includes('que significa pato')) {
+            return "Keiner.";
+        }
+
+        if (userMessage.includes('adiós') || userMessage.includes('hasta luego')) {
+            return "¡Hasta luego! Espero verte pronto.";
+        }
+
+        // Respuesta por defecto si el bot no entiende el mensaje
+        return "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?";
+    }
+
+    // Escuchar el evento 'Enter' para enviar el mensaje
+    chatInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Función para minimizar/restaurar la ventana del chat
+    minimizeBtn.addEventListener('click', () => {
+        isMinimized = !isMinimized;
+
+        if (isMinimized) {
+            chatContainer.classList.add('minimized'); // Minimiza la ventana
+            minimizeBtn.innerHTML = '+'; // Cambiar el icono a "+"
+        } else {
+            chatContainer.classList.remove('minimized'); // Restaura la ventana
+            minimizeBtn.innerHTML = '-'; // Cambiar el icono a "-"
+        }
+    });
+</script>
+
+</body>
+</html>
